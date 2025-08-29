@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Will You Marry Me?</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fcbad3, #a18cd1);
+      overflow: hidden;
+    }
+
+    /* Floating hearts background */
+    .hearts {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .heart {
+      position: absolute;
+      color: #e84393;
+      font-size: 20px;
+      animation: floatUp linear forwards;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(1); opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      background: rgba(255,255,255,0.9);
+      padding: 40px 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 700px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      animation: fadeIn 1.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #e84393;
+      text-shadow: 2px 2px 0 #fd79a8;
+      font-family: "Brush Script MT", cursive;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: scale(1);}
+      to { transform: scale(1.05);}
+    }
+
+    p {
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      color: #5a3d5c;
+    }
+
+    .btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      margin: 15px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .yes-btn {
+      background: #6c5ce7;
+      color: white;
+    }
+    .yes-btn:hover {
+      background: #5649c9;
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .no-btn {
+      background: #fd79a8;
+      color: white;
+      position: absolute;
+    }
+
+    .tooltip {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    /* Success screen */
+    .success {
+      font-size: 2rem;
+      color: #6c5ce7;
+      animation: fadeIn 1s ease, scaleUp 1.2s ease;
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.8);}
+      to { transform: scale(1);}
+    }
+
+    .emoji {
+      font-size: 3rem;
+      animation: jump 0.6s infinite alternate;
+    }
+    @keyframes jump {
+      from { transform: translateY(0);}
+      to { transform: translateY(-15px);}
+    }
+
+    /* Responsive */
+    @media(max-width:600px){
+      h1{ font-size: 2.2rem;}
+      p{ font-size: 1.1rem;}
+      .btn{ padding: 12px 25px; font-size: 1.1rem;}
+    }
+  </style>
+</head>
+<body>
+  <!-- floating hearts layer -->
+  <div class="hearts" id="hearts"></div>
+
+  <div class="container" id="main">
+    <h1>Will You Marry Me? ❤️</h1>
+    <p>You make my world magical ✨<br/>Choose wisely 😉</p>
+
+    <div class="btn-container">
+      <button class="btn yes-btn" title="Best Choice Ever 💍" onclick="sayYes()">YES! 🎉</button>
+      <button class="btn no-btn" id="no-btn" title="Wrong Answer 😜">No 😏</button>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById("no-btn");
+    const tooltip = document.getElementById("tooltip");
+    const funnyLines = [
+      "Are you blind? The 'YES' button is right there 😂",
+      "Error 404: 'No' option not found 😜",
+      "Hahaha you thought you could press No? 🤣",
+      "No WiFi for you if you click that! 📶❌",
+      "Warning ⚠️ Clicking 'No' installs Windows Vista!",
+      "Nice try... but fate says YES 💘",
+    ];
+
+    // dodging no button
+    noBtn.addEventListener("mouseover", () => {
+      const container = document.querySelector(".container");
+      const rect = container.getBoundingClientRect();
+
+      const maxX = rect.width - noBtn.offsetWidth - 40;
+      const maxY = rect.height - noBtn.offsetHeight - 40;
+
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+
+      noBtn.style.left = randomX + "px";
+      noBtn.style.top = randomY + "px";
+
+      tooltip.textContent = funnyLines[Math.floor(Math.random() * funnyLines.length)];
+    });
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      noBtn.dispatchEvent(new Event("mouseover"));
+    });
+
+    // YES button action
+    function sayYes() {
+      document.body.innerHTML = `
+        <div class="container success">
+          <h1>Yay! You made me the happiest person in the world ❤️</h1>
+          <p class="emoji">🎉💍🎊</p>
+          <p>Forever starts now 💖</p>
+        </div>`;
+      confettiAnimation();
+    }
+
+    // Floating hearts generator
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.classList.add("heart");
+      heart.innerHTML = "❤️";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.fontSize = (20 + Math.random() * 30) + "px";
+      heart.style.animationDuration = (3 + Math.random() * 5) + "s";
+      document.getElementById("hearts").appendChild(heart);
+
+      setTimeout(() => heart.remove(), 8000);
+    }
+    setInterval(createHeart, 500);
+
+    // Simple confetti hearts when YES
+    function confettiAnimation(){
+      for(let i=0; i<40; i++){
+        setTimeout(createHeart, i*100);
+      }
+    }
+  </script>
+</body>
+</html>
